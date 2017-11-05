@@ -45,6 +45,7 @@ var Map = function(settings) {
 				to: edge.v1.point
 			});
 		}
+		canvas.FlushLines(); 
 	};
 
 	self.BuildGraph = function() {

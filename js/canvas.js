@@ -11,7 +11,10 @@ var Canvas = function(elementId) {
 	self.DrawLine = function(line) {
 		self.canvasContext.moveTo(line.from.x, line.from.y);
 		self.canvasContext.lineTo(line.to.x, line.to.y);
-		self.canvasContext.stroke(); 
+	};
+
+	self.FlushLines = function() {
+		self.canvasContext.stroke(); 		
 	};
 
 	self.DrawPoint = function(point) {

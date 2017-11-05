@@ -13,4 +13,8 @@ var Canvas = function(elementId) {
 		self.canvasContext.lineTo(line.to.x, line.to.y);
 		self.canvasContext.stroke(); 
 	};
+
+	self.DrawPoint = function(point) {
+		self.canvasContext.fillRect(point.x, point.y, 1, 1);
+	};
 };

@@ -11,7 +11,7 @@ function interpolatePoint(a, b, frac) {
 var Map = function(settings) {
 	var self = this;
 	self.settings = settings;
-	self.random = new Srand(settings.seed);
+	self.random = new Srand(self.settings.seed);
 	self.points = [];
 	self.centers = [];
 	self.corners = [];
@@ -23,6 +23,24 @@ var Map = function(settings) {
 				x: self.random.randomIntegerIn(0, settings.width),
 				y: self.random.randomIntegerIn(0, settings.height)
 			});
+		}
+		
+		for (i = 0; i < self.settings.numberOfLloydRelaxations; i++) {
+			var bbox = {xl: 0, xr: self.settings.width, yt: 0, yb: self.settings.height};
+			var voronoi = new Voronoi();
+			var result = voronoi.compute(self.points, bbox);
+			self.points = [];
+			for (var c in result.cells) {
+				var cell = result.cells[c];
+				var p = { x: 0, y: 0 };
+				for(var e in cell.halfedges) {
+					p.x += cell.halfedges[e].getStartpoint().x;
+					p.y += cell.halfedges[e].getStartpoint().y;
+				}
+				p.x /= cell.halfedges.length;
+				p.y /= cell.halfedges.length;
+				self.points.push(p);
+			}
 		}
 	};
 
@@ -51,7 +69,7 @@ var Map = function(settings) {
 	self.BuildGraph = function() {
 		var bbox = {xl: 0, xr: self.settings.width, yt: 0, yb: self.settings.height};
 		var voronoi = new Voronoi();
-		result = voronoi.compute(self.points, bbox);
+		var result = voronoi.compute(self.points, bbox);
 		self.BuildGraphFromVoronoi(self.points, result);
 		//improveCorners();
 	};
@@ -208,7 +226,8 @@ var map = new Map({
 	width: 640,
 	height: 480,
 	numberOfPoints: 1000,
-	seed: 1
+	seed: 1,
+	numberOfLloydRelaxations: 2
 });
 
 map.Generate();

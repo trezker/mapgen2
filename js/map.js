@@ -328,6 +328,78 @@ var Map = function(settings) {
 			return c > (0.3+0.3*q.length*q.length);
 		};
 	};
+
+	// Determine polygon and corner types: ocean, coast, land.
+	self.assignOceanCoastAndLand = function() {
+		// Compute polygon attributes 'ocean' and 'water' based on the
+		// corner attributes. Count the water corners per
+		// polygon. Oceans are all polygons connected to the edge of the
+		// map. In the first pass, mark the edges of the map as ocean;
+		// in the second pass, mark any water-containing polygon
+		// connected an ocean as ocean.
+		var queue = [];
+
+		for(var i in self.centers) {
+			var p = self.centers[i];
+			var numWater = 0;
+			for(var j in p.corners) {
+				var q = p.corners[j];
+				if (q.border) {
+					p.border = true;
+					p.ocean = true;
+					q.water = true;
+					queue.push(p);
+				}
+				if (q.water) {
+					numWater += 1;
+				}
+			}
+			p.water = (p.ocean || numWater >= p.corners.length * LAKE_THRESHOLD);
+		}
+		while (queue.length > 0) {
+			var p = queue.shift();
+			for(var i in p.neighbors) {
+				var r = p.neighbors[i];
+				if (r.water && !r.ocean) {
+					r.ocean = true;
+					queue.push(r);
+				}
+			}
+		}
+
+		// Set the polygon attribute 'coast' based on its neighbors. If
+		// it has at least one ocean and at least one land neighbor,
+		// then this is a coastal polygon.
+		for(var i in self.centers) {
+			var p = self.centers[i];
+			var numOcean = 0;
+			var numLand = 0;
+			for(var j in p.neighbors) {
+				var r = p.neighbors[j];
+				numOcean += Math.floor(r.ocean);
+				numLand += Math.floor(!r.water);
+			}
+			p.coast = (numOcean > 0) && (numLand > 0);
+		}
+
+		// Set the corner attributes based on the computed polygon
+		// attributes. If all polygons connected to this corner are
+		// ocean, then it's ocean; if all are land, then it's land;
+		// otherwise it's coast.
+		for(var i in self.corners) {
+			var q = self.corners[i];
+			var numOcean = 0;
+			var numLand = 0;
+			for(var j in q.touches) {
+				var p = q.touches[j];
+				numOcean += Math.floor(p.ocean);
+				numLand += Math.floor(!p.water);
+			}
+			q.ocean = (numOcean == q.touches.length);
+			q.coast = (numOcean > 0) && (numLand > 0);
+			q.water = q.border || ((numLand != q.touches.length) && !q.coast);
+		}
+	};
 };
 
 

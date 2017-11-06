@@ -224,9 +224,9 @@ var Map = function(settings) {
 	self.AssignElevations = function() {
 		// Determine the elevations and water at Voronoi corners.
 		self.assignCornerElevations();
-/*
+
 		// Determine polygon and corner type: ocean, coast, land.
-		assignOceanCoastAndLand();
+		self.assignOceanCoastAndLand();
 
 		// Rescale elevations so that the highest is 1.0, and they're
 		// distributed well. We want lower elevations to be more common
@@ -235,6 +235,7 @@ var Map = function(settings) {
 		// largest ring around the island, and therefore should more
 		// land area than the highest elevation, which is the very
 		// center of a perfectly circular island.
+		/*
 		redistributeElevations(landCorners(corners));
 
 		// Assign elevations to non-land corners
@@ -354,7 +355,7 @@ var Map = function(settings) {
 					numWater += 1;
 				}
 			}
-			p.water = (p.ocean || numWater >= p.corners.length * LAKE_THRESHOLD);
+			p.water = (p.ocean || numWater >= p.corners.length * self.settings.lakeThreshold);
 		}
 		while (queue.length > 0) {
 			var p = queue.shift();
@@ -409,7 +410,8 @@ var map = new Map({
 	height: 480,
 	numberOfPoints: 1000,
 	seed: 1,
-	numberOfLloydRelaxations: 2
+	numberOfLloydRelaxations: 2,
+	lakeThreshold: .3
 });
 
 map.Generate();

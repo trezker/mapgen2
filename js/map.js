@@ -45,8 +45,10 @@ var Map = function(settings) {
 	};
 
 	self.Generate = function() {
+		self.islandShape = self.makePerlin(self.settings.seed);
 		self.PlacePoints();
 		self.BuildGraph();
+		self.AssignElevations();
 	};
 	
 	self.DrawPoints = function(canvas) {
@@ -217,6 +219,114 @@ var Map = function(settings) {
 				addToCenterList(edge.v1.touches, edge.d1);
 			}
 		}
+	};
+
+	self.AssignElevations = function() {
+		// Determine the elevations and water at Voronoi corners.
+		self.assignCornerElevations();
+/*
+		// Determine polygon and corner type: ocean, coast, land.
+		assignOceanCoastAndLand();
+
+		// Rescale elevations so that the highest is 1.0, and they're
+		// distributed well. We want lower elevations to be more common
+		// than higher elevations, in proportions approximately matching
+		// concentric rings. That is, the lowest elevation is the
+		// largest ring around the island, and therefore should more
+		// land area than the highest elevation, which is the very
+		// center of a perfectly circular island.
+		redistributeElevations(landCorners(corners));
+
+		// Assign elevations to non-land corners
+		for each (var q:Corner in corners) {
+			if (q.ocean || q.coast) {
+				q.elevation = 0.0;
+			}
+		}
+
+		// Polygon elevations are the average of their corners
+		assignPolygonElevations();*/
+	};
+
+    // Determine elevations and water at Voronoi corners. By
+    // construction, we have no local minima. This is important for
+    // the downslope vectors later, which are used in the river
+    // construction algorithm. Also by construction, inlets/bays
+    // push low elevation areas inland, which means many rivers end
+    // up flowing out through them. Also by construction, lakes
+    // often end up on river paths because they don't raise the
+    // elevation as much as other terrain does.
+    self.assignCornerElevations = function() {
+		var queue = [];
+
+		for(var q in self.corners) {
+			self.corners[q].water = !self.inside(self.corners[q].point);
+		}
+
+		for(var q in self.corners) {
+			// The edges of the map are elevation 0
+			if (self.corners[q].border) {
+				self.corners[q].elevation = 0.0;
+				queue.push(self.corners[q]);
+			} else {
+				self.corners[q].elevation = Infinity;
+			}
+		}
+		// Traverse the graph and assign elevations to each point. As we
+		// move away from the map border, increase the elevations. This
+		// guarantees that rivers always have a way down to the coast by
+		// going downhill (no local minima).
+		while (queue.length > 0) {
+			var q = queue.shift();
+
+			for(var s in q.adjacent) {
+				// Every step up is epsilon over water or 1 over land. The
+				// number doesn't matter because we'll rescale the
+				// elevations later.
+				var newElevation = 0.01 + q.elevation;
+				if (!q.water && !q.adjacent[s].water) {
+					newElevation += 1;
+					if (needsMoreRandomness) {
+						// HACK: the map looks nice because of randomness of
+						// points, randomness of rivers, and randomness of
+						// edges. Without random point selection, I needed to
+						// inject some more randomness to make maps look
+						// nicer. I'm doing it here, with elevations, but I
+						// think there must be a better way. This hack is only
+						// used with square/hexagon grids.
+						newElevation += mapRandom.nextDouble();
+					}
+				}
+				// If this point changed, we'll add it to the queue so
+				// that we can process its neighbors too.
+				if (newElevation < q.adjacent[s].elevation) {
+					q.adjacent[s].elevation = newElevation;
+					queue.push(q.adjacent[s]);
+				}
+			}
+		}
+	};
+
+	// Determine whether a given point should be on the island or in the water.
+	self.inside = function(p) {
+		return self.islandShape({ 
+			x: 2*(p.x/self.settings.width - 0.5), 
+			y: 2*(p.y/self.settings.height - 0.5)
+		});
+	};
+	
+	// The Perlin-based island combines perlin noise with the radius
+	self.makePerlin = function(seed) {
+		/*
+		var perlin = new BitmapData(256, 256);
+		perlin.perlinNoise(64, 64, 8, seed, false, true);
+		*/
+		return function (q) {
+			var scale = 1;  // pick a scaling value
+			var c = PerlinNoise.noise(scale*q.x, scale*q.y, .8);
+			q.length = Math.sqrt(q.x*q.x+q.y*q.y);
+			return c > (0.3+0.3*q.length*q.length);
+		};
 	};
 };
 

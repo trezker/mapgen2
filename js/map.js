@@ -68,6 +68,26 @@ var Map = function(settings) {
 		canvas.FlushLines(); 
 	};
 
+	self.DrawPolygons = function(canvas) {
+		//for(var i in self.centers) {
+		{
+			var i = 9;
+			var center = self.centers[i];
+			console.log(center);
+			
+			for(var j in center.borders) {
+				canvas.DrawPolygon({
+					color: "#f0"+j,
+					corners: [
+						center.point,
+						center.borders[j].v0.point,
+						center.borders[j].v1.point
+					]
+				});
+			}
+		}
+	};
+
 	self.BuildGraph = function() {
 		var bbox = {xl: 0, xr: self.settings.width, yt: 0, yb: self.settings.height};
 		var voronoi = new Voronoi();
@@ -98,19 +118,12 @@ var Map = function(settings) {
 				point: self.points[point],
 				neighbors: [],
 				borders: [],
-				corners: [],
+				corners: []
 			};
 			self.centers.push(p);
-			centerLookup[self.points[point]] = p;
+			centerLookup[self.points[point].voronoiId] = p;
 		}
-      
-		// Workaround for Voronoi lib bug: we need to call region()
-		// before Edges or neighboringSites are available
-		/*
-		for each (p in centers) {
-			voronoi.region(p.point);
-		}*/
-      
+
 		// The Voronoi library generates multiple Point objects for
 		// corners, and we need to canonicalize to one Corner object.
 		// To make lookup fast, we keep an array of Points, bucketed by
@@ -160,11 +173,9 @@ var Map = function(settings) {
 				v.push(x);
 			}
 		}
-          
+
 		for(var libedge in libedges) {
 			var ledge = libedges[libedge];
-			//var dedge = libedges[libedge].delaunayLine();
-			//var vedge = libedges[libedge].voronoiEdge();
 
 			// Fill the graph data. Make an Edge object corresponding to
 			// the edge from the voronoi library.
@@ -176,8 +187,8 @@ var Map = function(settings) {
 				// Edges point to corners. Edges point to centers. 
 				v0: makeCorner(ledge.va),
 				v1: makeCorner(ledge.vb),
-				d0: centerLookup[ledge.lSite],
-				d1: centerLookup[ledge.rSite]
+				d0: ledge.lSite? centerLookup[ledge.lSite.voronoiId]: null,
+				d1: ledge.rSite? centerLookup[ledge.rSite.voronoiId]: null
 			};
 			self.edges.push(edge);
 
@@ -408,7 +419,7 @@ var Map = function(settings) {
 var map = new Map({
 	width: 640,
 	height: 480,
-	numberOfPoints: 1000,
+	numberOfPoints: 10,
 	seed: 1,
 	numberOfLloydRelaxations: 2,
 	lakeThreshold: .3
@@ -419,5 +430,6 @@ map.Generate();
 var canvas = new Canvas("canvas");
 canvas.Resize(map.settings.width, map.settings.height);
 
+map.DrawPolygons(canvas);
 map.DrawPoints(canvas);
 map.DrawEdges(canvas);

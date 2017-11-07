@@ -20,4 +20,15 @@ var Canvas = function(elementId) {
 	self.DrawPoint = function(point) {
 		self.canvasContext.fillRect(point.x, point.y, 1, 1);
 	};
+
+	self.DrawPolygon = function(polygon) {
+		self.canvasContext.fillStyle = polygon.color;
+		self.canvasContext.beginPath();
+		self.canvasContext.moveTo(polygon.corners[0].x, polygon.corners[0].y);
+		for(var i = 1; i < polygon.corners.length; i++) {
+			self.canvasContext.lineTo(polygon.corners[i].x, polygon.corners[i].y);
+		}
+		self.canvasContext.closePath();
+		self.canvasContext.fill();
+	};
 };

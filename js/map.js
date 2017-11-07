@@ -58,23 +58,21 @@ var Map = function(settings) {
 	};
 
 	self.DrawEdges = function(canvas) {
-		for(var e in self.edges) {
-			var edge = self.edges[e];
-			canvas.DrawLine({
-				from: edge.v0.point,
-				to: edge.v1.point
-			});
-		}
-		canvas.FlushLines(); 
+		var lines = self.edges.map(function(a) {
+			return {
+				from: a.v0.point,
+				to: a.v1.point
+			};
+		});
+		canvas.DrawLines({
+			color: "#000",
+			lines: lines
+		});
 	};
 
 	self.DrawPolygons = function(canvas) {
-		//for(var i in self.centers) {
-		{
-			var i = 9;
+		for(var i in self.centers) {
 			var center = self.centers[i];
-			console.log(center);
-			
 			for(var j in center.borders) {
 				canvas.DrawPolygon({
 					color: "#f0"+j,

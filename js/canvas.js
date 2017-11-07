@@ -9,9 +9,27 @@ var Canvas = function(elementId) {
 	};
 
 	self.DrawLine = function(line) {
+		self.canvasContext.strokeStyle = line.color;
 		self.canvasContext.moveTo(line.from.x, line.from.y);
 		self.canvasContext.lineTo(line.to.x, line.to.y);
 	};
+
+	self.NewLines = function() {
+		self.canvasContext.beginPath();		
+	}
+
+	self.DrawLines = function(lines) {
+		self.canvasContext.beginPath();		
+		self.canvasContext.strokeStyle = lines.color;
+
+		for(l in lines.lines) {
+			var line = lines.lines[l];
+			self.canvasContext.moveTo(line.from.x, line.from.y);
+			self.canvasContext.lineTo(line.to.x, line.to.y);
+		}
+
+		self.canvasContext.stroke(); 		
+	}
 
 	self.FlushLines = function() {
 		self.canvasContext.stroke(); 		

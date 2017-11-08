@@ -306,16 +306,6 @@ var Map = function(settings) {
 				var newElevation = 0.01 + q.elevation;
 				if (!q.water && !q.adjacent[s].water) {
 					newElevation += 1;
-					if (needsMoreRandomness) {
-						// HACK: the map looks nice because of randomness of
-						// points, randomness of rivers, and randomness of
-						// edges. Without random point selection, I needed to
-						// inject some more randomness to make maps look
-						// nicer. I'm doing it here, with elevations, but I
-						// think there must be a better way. This hack is only
-						// used with square/hexagon grids.
-						newElevation += mapRandom.nextDouble();
-					}
 				}
 				// If this point changed, we'll add it to the queue so
 				// that we can process its neighbors too.
@@ -343,7 +333,7 @@ var Map = function(settings) {
 		*/
 		return function (q) {
 			var scale = 1;  // pick a scaling value
-			var c = PerlinNoise.noise(scale*q.x, scale*q.y, .8);
+			var c = PerlinNoise.noise(scale*q.x, scale*q.y, seed);
 			q.length = Math.sqrt(q.x*q.x+q.y*q.y);
 			return c > (0.3+0.3*q.length*q.length);
 		};

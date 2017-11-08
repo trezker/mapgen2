@@ -327,12 +327,8 @@ var Map = function(settings) {
 	
 	// The Perlin-based island combines perlin noise with the radius
 	self.makePerlin = function(seed) {
-		/*
-		var perlin = new BitmapData(256, 256);
-		perlin.perlinNoise(64, 64, 8, seed, false, true);
-		*/
 		return function (q) {
-			var scale = 1;  // pick a scaling value
+			var scale = self.settings.perlinScale;  // pick a scaling value
 			var c = PerlinNoise.noise(scale*q.x, scale*q.y, seed);
 			q.length = Math.sqrt(q.x*q.x+q.y*q.y);
 			return c > (0.3+0.3*q.length*q.length);

@@ -4,10 +4,11 @@ var MapViewmodel = function() {
 	self.defaultMapParameters = {
 		width: 640,
 		height: 480,
-		numberOfPoints: 100,
+		numberOfPoints: 1000,
 		seed: 1,
 		numberOfLloydRelaxations: 2,
-		lakeThreshold: .3
+		lakeThreshold: .3,
+		perlinScale: 3
 	};
 
 	self.mapParameters = ko.mapping.fromJS(self.defaultMapParameters);

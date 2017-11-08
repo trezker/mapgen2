@@ -21,6 +21,7 @@ var Canvas = function(elementId) {
 	self.DrawLines = function(lines) {
 		self.canvasContext.beginPath();		
 		self.canvasContext.strokeStyle = lines.color;
+ 		self.canvasContext.lineWidth = 1;
 
 		for(l in lines.lines) {
 			var line = lines.lines[l];
@@ -28,7 +29,7 @@ var Canvas = function(elementId) {
 			self.canvasContext.lineTo(line.to.x, line.to.y);
 		}
 
-		self.canvasContext.stroke(); 		
+		self.canvasContext.stroke();
 	}
 
 	self.FlushLines = function() {
@@ -40,7 +41,9 @@ var Canvas = function(elementId) {
 	};
 
 	self.DrawPolygon = function(polygon) {
-		self.canvasContext.fillStyle = polygon.color;
+ 		self.canvasContext.lineWidth = 1.51;
+		self.canvasContext.strokeStyle = polygon.color;
+ 		self.canvasContext.fillStyle = polygon.color;
 		self.canvasContext.beginPath();
 		self.canvasContext.moveTo(polygon.corners[0].x, polygon.corners[0].y);
 		for(var i = 1; i < polygon.corners.length; i++) {
@@ -48,5 +51,6 @@ var Canvas = function(elementId) {
 		}
 		self.canvasContext.closePath();
 		self.canvasContext.fill();
+		self.canvasContext.stroke(); 		
 	};
 };

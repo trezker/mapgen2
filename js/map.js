@@ -70,12 +70,22 @@ var Map = function(settings) {
 		});
 	};
 
+	self.biomeColors = {
+		"ocean": "#00f",
+		"land": "#0f0"
+	};
+
 	self.DrawPolygons = function(canvas) {
-		for(var i in self.centers) {
+		for(var i in self.centers) 
+		{
 			var center = self.centers[i];
 			for(var j in center.borders) {
+				var color = self.biomeColors.land;
+				if(center.ocean) {
+					color = self.biomeColors.ocean;
+				}
 				canvas.DrawPolygon({
-					color: "#f0"+j,
+					color: color,
 					corners: [
 						center.point,
 						center.borders[j].v0.point,
@@ -417,7 +427,7 @@ var Map = function(settings) {
 var map = new Map({
 	width: 640,
 	height: 480,
-	numberOfPoints: 10,
+	numberOfPoints: 100,
 	seed: 1,
 	numberOfLloydRelaxations: 2,
 	lakeThreshold: .3

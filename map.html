@@ -1,14 +1,54 @@
 <html>
 	<head>
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<canvas id="canvas" style="border:1px solid #000000;"></canvas>
+		<div id="flex">
+			<div>
+				<canvas id="canvas" style="border:1px solid #000000;"></canvas>
+			</div>
+			<div>
+				<div class="form-group">
+					<label class="control-label">Seed</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.seed" />
+				</div>
+				<div class="form-group">
+					<label class="control-label">Width</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.width" />
+				</div>
+				<div class="form-group">
+					<label class="control-label">Height</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.height" />
+				</div>
+				<div class="form-group">
+					<label class="control-label">Cells</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.numberOfPoints" />
+				</div>
+				<div class="form-group">
+					<label class="control-label">Relaxations</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.numberOfLloydRelaxations" />
+				</div>
+				<div class="form-group">
+					<label class="control-label">Lake threshold</label>
+					<input type="text" class="form-control" data-bind="value: mapParameters.lakeThreshold" />
+				</div>
+				<div class="form-group">
+					<button data-bind="click: CreateMap" class="btn btn-primary">Create map</button>
+				</div>
+			</div>
+		</div>
+
 		<script type='text/javascript' src='js/jquery-2.1.3.min.js'></script>
+		<script type='text/javascript' src='js/bootstrap.min.js'></script>
+		<script type='text/javascript' src='js/knockout-3.4.1.js'></script>
+		<script type='text/javascript' src='js/knockout.mapping-latest.js'></script>
 		<script type='text/javascript' src='js/rhill-voronoi-core.js'></script>
 		<script type='text/javascript' src='js/perlin.js'></script>
 
 		<script type='text/javascript' src='js/jsrand.js'></script>
 		<script type='text/javascript' src='js/canvas.js'></script>
 		<script type='text/javascript' src='js/map.js'></script>
+		<script type='text/javascript' src='js/mapViewmodel.js'></script>
 	</body>
 </html>

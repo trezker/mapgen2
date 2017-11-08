@@ -421,23 +421,3 @@ var Map = function(settings) {
 		}
 	};
 };
-
-
-
-var map = new Map({
-	width: 640,
-	height: 480,
-	numberOfPoints: 100,
-	seed: 1,
-	numberOfLloydRelaxations: 2,
-	lakeThreshold: .3
-});
-
-map.Generate();
-
-var canvas = new Canvas("canvas");
-canvas.Resize(map.settings.width, map.settings.height);
-
-map.DrawPolygons(canvas);
-map.DrawPoints(canvas);
-map.DrawEdges(canvas);
